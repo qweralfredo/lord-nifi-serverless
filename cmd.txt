@@ -1,0 +1,51 @@
+keytool -genkeypair \
+  -alias nifi-registry \
+  -keyalg RSA \
+  -keysize 2048 \
+  -dname "CN=localhost, OU=Nifi, O=MyOrg, L=MyCity, ST=MyState, C=MyCountry" \
+  -keypass lordnifi \
+  -storepass lordnifi \
+  -keystore keystore.jks
+
+
+keytool -exportcert \
+  -alias nifi-registry \
+  -keystore keystore.jks \
+  -storepass lordnifi \
+  -rfc \
+  -file nifi-registry.crt
+
+
+keytool -exportcert \
+  -alias nifi-registry \
+  -keystore keystore.jks \
+  -storepass lordnifi \
+  -rfc \
+  -file nifi-registry.crt
+
+
+
+keytool -importcert \
+  -alias nifi-registry \
+  -file nifi-registry.crt \
+  -keystore truststore.jks \
+  -storepass lordnifi \
+  -noprompt
+ 
+gcloud auth configure-docker us-docker.pkg.dev
+ 
+gcloud artifacts repositories list --project=bi-project-384214
+
+docker build -t us-docker.pkg.dev/bi-project-384214/lord-nifi-registry/lord-nifi-registry:0.0.1 .
+ 
+docker push us-docker.pkg.dev/bi-project-384214/lord-nifi-registry:0.0.1
+
+docker push us-docker.pkg.dev/bi-project-384214/lord-nifi-registry/lord-nifi-registry:0.0.1
+
+
+gcloud run deploy lord-nifi-registry \
+--image=us-docker.pkg.dev/bi-project-384214/lord-nifi-registry:0.0.1 \
+--platform=managed \
+--region=us-central1 \
+--allow-unauthenticated \
+--port=18080

@@ -1,0 +1,24 @@
+FROM apache/nifi-registry:latest
+
+USER root
+# Crie o diretório para os certificados
+RUN mkdir -p /opt/certs
+
+# Copie os certificados para a imagem (ajuste o caminho se necessário)
+COPY ./certs /opt/certs
+
+# Defina as variáveis de ambiente
+ENV AUTH=tls
+ENV KEYSTORE_PATH=/opt/certs/keystore.jks
+ENV KEYSTORE_TYPE=JKS
+ENV KEYSTORE_PASSWORD=QKZv1hSWAFQYZ+WU1jjF5ank+l4igeOfQRp+OSbkkrs
+ENV TRUSTSTORE_PATH=/opt/certs/truststore.jks
+ENV TRUSTSTORE_PASSWORD=rHkWR1gDNW3R9hgbeRsT3OM3Ue0zwGtQqcFKJD2EXWE
+ENV TRUSTSTORE_TYPE=JKS
+ENV INITIAL_ADMIN_IDENTITY='CN=AdminUser, OU=nifi'
+
+# Exponha a porta 18443
+EXPOSE 18443
+
+# Comando para iniciar o NiFi Registry
+CMD ["/opt/nifi-registry/bin/nifi-registry.sh", "run"]
